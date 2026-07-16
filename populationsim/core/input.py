@@ -153,7 +153,7 @@ def read_from_table_info(table_info):
                     map_col = parent_table[f"_original_{lookup_col}"]
                 except KeyError:
                     map_col = parent_table[lookup_col]
-                remapper = dict(zip(map_col, parent_table.index))
+                remapper = dict(zip(map_col, parent_table.index, strict=True))
                 df[colname] = df[colname].apply(remapper.get)
 
     # set index
