@@ -60,7 +60,7 @@ class Integerizer:
         else:
             self.integerizer_func = lp_ortools.np_integerizer_ortools
 
-        self.timeout_in_seconds = config.setting("INTEGIZER_TIMEOUT", 60)
+        self.timeout_in_seconds = config.setting("INTEGERIZER_TIMEOUT", 60)
 
     def integerize(self):
 
