@@ -11,7 +11,10 @@ from populationsim.integerizing import do_integerizing
 
 
 @pytest.mark.parametrize("use_cvpxy", [True, False], ids=["cvxpy", "ortools"])
-def test_integerizer(use_cvpxy):
+@pytest.mark.parametrize(
+    "integerizer_quantum", [None, 1e-6], ids=["default", "quantized"]
+)
+def test_integerizer(use_cvpxy, integerizer_quantum):
     example_dir = Path(__file__).parent.parent / "examples"
 
     configs_dir = example_dir / "example_test" / "configs"
@@ -64,6 +67,7 @@ def test_integerizer(use_cvpxy):
     config.override_setting(
         "USE_CVXPY", use_cvpxy  # use ortools integerizer instead of cvxpy
     )
+    config.override_setting("INTEGERIZER_QUANTUM", integerizer_quantum)
     integerized_weights, status = do_integerizing(
         trace_label="label",
         control_spec=control_spec,

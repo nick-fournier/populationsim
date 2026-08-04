@@ -3,6 +3,7 @@ import pandas as pd
 from pathlib import Path
 
 from populationsim.core import config, tracing, inject, pipeline
+from tests.regression import assert_expanded_regression
 
 _MODELS = [
     "input_pre_processor",
@@ -102,5 +103,5 @@ def test_full_run_flex(params):
             Path(__file__).parent / "expected" / params["expected_fname"]
         )
 
-    # Compare the two dataframes
-    assert expanded_household_ids.equals(expected_hh_ids)
+    # see tests/regression.py for why this is not an exact frame comparison
+    assert_expanded_regression(expanded_household_ids, expected_hh_ids)
