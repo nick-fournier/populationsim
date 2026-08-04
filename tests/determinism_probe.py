@@ -18,11 +18,18 @@ epsilon = float(sys.argv[1])
 seed = int(sys.argv[2])
 rng = np.random.default_rng(seed)
 original_quantize = reproducibility.quantize_weights
+quantize_calls = 0
+perturbed_values = 0
 
 
 def perturb_then_quantize(weights, quantum):
+    global perturbed_values, quantize_calls
+
+    quantize_calls += 1
     values = np.asarray(weights, dtype=np.float64)
-    values = values * (1.0 + epsilon * rng.standard_normal(values.shape))
+    perturbed = values * (1.0 + epsilon * rng.standard_normal(values.shape))
+    perturbed_values += np.count_nonzero(perturbed != values)
+    values = perturbed
     return original_quantize(values, quantum)
 
 
@@ -63,6 +70,8 @@ result = {
     ).hexdigest(),
     "rows": len(households),
     "zone_counts": households.groupby("TAZ").size().to_dict(),
+    "quantize_calls": quantize_calls,
+    "perturbed_values": int(perturbed_values),
 }
 pipeline.close_pipeline()
 print("DETERMINISM_RESULT " + json.dumps(result, sort_keys=True))

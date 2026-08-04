@@ -66,10 +66,9 @@ def test_quantized_pipeline_resists_boundary_perturbation():
     env = os.environ.copy()
     env["PYTHONPATH"] = str(root)
 
-    results = []
-    for seed in (1, 2):
+    def run_probe(epsilon, seed):
         completed = subprocess.run(
-            [sys.executable, str(probe), "1e-12", str(seed)],
+            [sys.executable, str(probe), str(epsilon), str(seed)],
             cwd=root,
             env=env,
             capture_output=True,
@@ -82,8 +81,24 @@ def test_quantized_pipeline_resists_boundary_perturbation():
             for line in completed.stdout.splitlines()
             if line.startswith("DETERMINISM_RESULT ")
         )
-        results.append(json.loads(result_line.removeprefix("DETERMINISM_RESULT ")))
+        return json.loads(result_line.removeprefix("DETERMINISM_RESULT "))
 
-    assert results[0] == results[1]
-    assert results[0]["rows"] == 1500
-    assert results[0]["hash"] == EXPECTED_QUANTIZED_HASH
+    scenarios = [(0, 1)] + [
+        (epsilon, seed) for epsilon in (1e-12, 1e-9) for seed in (1, 2, 3)
+    ]
+    results = [(epsilon, run_probe(epsilon, seed)) for epsilon, seed in scenarios]
+
+    for epsilon, result in results:
+        assert result["quantize_calls"] > 0
+        if epsilon == 0:
+            assert result["perturbed_values"] == 0
+        else:
+            assert result["perturbed_values"] > 0
+        assert result["rows"] == 1500
+        assert result["hash"] == EXPECTED_QUANTIZED_HASH
+
+    canonical_outputs = {
+        (result["hash"], tuple(sorted(result["zone_counts"].items())))
+        for _, result in results
+    }
+    assert len(canonical_outputs) == 1
