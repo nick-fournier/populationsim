@@ -10,6 +10,17 @@ from populationsim.core import inject, config
 from populationsim.integerizing import do_integerizing
 
 
+def teardown_function(func):
+    # This test pins `settings` via config.override_setting, which replaces the
+    # decorated injectable with a plain dict. clear_cache() does not restore a
+    # decorated injectable -- only reinject_decorated_tables() does. Without
+    # this teardown every later test in the session inherits this example's
+    # settings, including its `geographies` list, and fails for reasons that
+    # have nothing to do with what it is testing.
+    inject.clear_cache()
+    inject.reinject_decorated_tables()
+
+
 @pytest.mark.parametrize("use_cvpxy", [True, False], ids=["cvxpy", "ortools"])
 @pytest.mark.parametrize(
     "integerizer_quantum", [None, 1e-6], ids=["default", "quantized"]
