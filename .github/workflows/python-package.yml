@@ -15,6 +15,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
+      # Deliberately not a square matrix, so the combinations are listed out
+      # rather than generated. Linux carries the full Python sweep; Windows and
+      # macOS get a single spot-check each. Those two exist to catch platform
+      # divergence rather than version divergence -- word size (`int` is int32
+      # on Windows) and differences in the compiled solver -- which one Python
+      # version exercises just as well as four. A square os x python matrix
+      # would double the job count to buy very little.
       matrix:
         include:
         - os: ubuntu-latest
