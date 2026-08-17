@@ -6,6 +6,8 @@ from populationsim.core import tracing, inject, pipeline
 
 
 def teardown_function(func):
+    if pipeline.is_open():
+        pipeline.close_pipeline()
     inject.clear_cache()
     inject.reinject_decorated_tables()
 

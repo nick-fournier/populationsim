@@ -45,7 +45,8 @@ def setup_function():
 
 def teardown_function():
     # tables will no longer be available after pipeline is closed
-    pipeline.close_pipeline()
+    if pipeline.is_open():
+        pipeline.close_pipeline()
     inject.clear_cache()
     inject.reinject_decorated_tables()
 
