@@ -49,8 +49,19 @@ def test_intermediate_geography():
 
     example_dir = Path(__file__).parent.parent / "examples" / "example_test"
 
-    inject.add_injectable("data_dir", example_dir / "data_intermediate")
-    inject.add_injectable("configs_dir", example_dir / "configs_intermediate")
+    # configs_dir and data_dir both cascade: the first directory holding a
+    # given file wins. The *_intermediate directories therefore carry only what
+    # this example actually changes -- its settings, controls, and the crosswalk
+    # with the extra geography levels -- and everything shared (seed households
+    # and persons, TAZ and TRACT controls, logging) resolves from the base
+    # example. Copying those would leave this example silently testing stale
+    # inputs whenever the originals changed.
+    inject.add_injectable(
+        "data_dir", [example_dir / "data_intermediate", example_dir / "data"]
+    )
+    inject.add_injectable(
+        "configs_dir", [example_dir / "configs_intermediate", example_dir / "configs"]
+    )
     inject.add_injectable("output_dir", Path(__file__).parent / "output")
 
     inject.clear_cache()
