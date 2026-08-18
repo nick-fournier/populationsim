@@ -23,7 +23,10 @@ def teardown_function(func):
 
 @pytest.mark.parametrize("use_cvpxy", [True, False], ids=["cvxpy", "ortools"])
 @pytest.mark.parametrize(
-    "integerizer_quantum", [None, 1e-6], ids=["default", "quantized"]
+    # None is an explicit opt-out; the integerizers default to 1e-6 on their
+    # own (see single_integerizer.py / simul_integerizer.py), so this override
+    # is what exercises the disabled path at all.
+    "integerizer_quantum", [None, 1e-6], ids=["unquantized", "quantized"]
 )
 def test_integerizer(use_cvpxy, integerizer_quantum):
     example_dir = Path(__file__).parent.parent / "examples"

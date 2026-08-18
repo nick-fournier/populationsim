@@ -54,3 +54,10 @@ jobs:
 
     - name: Run tests
       run: uv run pytest
+
+    - name: Print determinism fingerprint (cross-platform check)
+      # Unperturbed run of the quantized integerizer. Compare the printed
+      # hash across this matrix's jobs by hand -- an equal hash on every OS
+      # confirms quantization also makes CBC's own platform-dependent tie
+      # choice converge, not just our own pre-solver rounding.
+      run: uv run python tests/determinism_probe.py 0 1

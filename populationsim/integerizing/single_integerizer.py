@@ -62,7 +62,10 @@ class Integerizer:
             self.integerizer_func = lp_ortools.np_integerizer_ortools
 
         self.timeout_in_seconds = config.setting("INTEGERIZER_TIMEOUT", 60)
-        self.quantum = config.setting("INTEGERIZER_QUANTUM", None)
+        # Snapping weights to a grid before rounding makes household
+        # selection immune to sub-ULP cross-platform float noise, so this
+        # defaults to on -- see tests/test_reproducibility.py.
+        self.quantum = config.setting("INTEGERIZER_QUANTUM", 1e-6)
 
     def integerize(self):
 
