@@ -61,6 +61,10 @@ def test_smart_round_preserves_historical_default():
 
 
 def test_quantized_pipeline_resists_boundary_perturbation():
+    # EXPECTED_QUANTIZED_HASH is a fixed literal, so the CI matrix doubles as a
+    # cross-platform check: every OS asserts the same fingerprint. Agreement
+    # there confirms quantization also makes CBC's own platform-dependent tie
+    # choice converge, not just our pre-solver rounding.
     root = Path(__file__).resolve().parents[1]
     probe = Path(__file__).with_name("determinism_probe.py")
     env = os.environ.copy()
